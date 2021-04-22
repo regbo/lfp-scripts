@@ -4,8 +4,7 @@ echo "Starting the new server setup script"
 cd ~
 
 # Update the system
-sudo apt-get update && sudo apt-get upgrade -y
-
+sudo apt-get update -y
 
 echo ""
 echo "Installing unattended-upgrades..."
