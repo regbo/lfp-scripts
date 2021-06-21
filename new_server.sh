@@ -51,3 +51,6 @@ curl -fsSL get.docker.com -o get-docker.sh
 CHANNEL=stable sh get-docker.sh
 # Remove Docker install script
 rm get-docker.sh
+
+echo "Installing docker-compose..."
+sudo apt-get install docker-compose -y
