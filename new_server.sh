@@ -1,5 +1,5 @@
 #!/bin/bash
-#curl -s https://raw.githubusercontent.com/regbo/lfp-scripts/main/new_server.sh | sudo bash
+#curl -s https://raw.githubusercontent.com/regbo/lfp-scripts/main/new_server.sh | bash
 
 echo "Starting the new server setup script"
 cd ~
@@ -48,7 +48,8 @@ echo "Installing docker-ce..."
 # Download Docker
 curl -fsSL get.docker.com -o get-docker.sh
 # Install Docker using the stable channel (instead of the default "edge")
-CHANNEL=stable sh get-docker.sh
+CHANNEL=stable
+sudo sh get-docker.sh
 # Remove Docker install script
 rm get-docker.sh
 
