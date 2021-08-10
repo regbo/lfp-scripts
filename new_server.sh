@@ -54,3 +54,8 @@ rm get-docker.sh
 
 echo "Installing docker-compose..."
 sudo apt-get install docker-compose -y
+
+if [ "$EUID" -ne 0 ]; then
+  echo "Adding $USER to docker group"
+  sudo usermod -aG docker $USER
+fi
