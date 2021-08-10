@@ -1,5 +1,5 @@
 #!/bin/bash
-#curl -s https://raw.githubusercontent.com/regbo/lfp-scripts/main/new_server.sh | bash
+#curl -s https://raw.githubusercontent.com/regbo/lfp-scripts/main/new_server.sh | sudo bash
 
 echo "Starting the new server setup script"
 cd ~
