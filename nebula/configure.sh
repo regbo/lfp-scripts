@@ -5,30 +5,27 @@ mkdir -p /root/nebula
 cd /root/nebula
 echo "downloading config"
 curl -s -L https://github.com/slackhq/nebula/raw/master/examples/config.yml --output config.yml
-#set pki ca
-pkiKey=ca
-pkiPath=/root/nebula/ca.crt
-pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
-if [ ! -f "$pkiPath" ]; then
-	echo "$pkiKey not found:$pkiPath"
-    exit 1
-fi
-#set pki cert
-pkiKey=cert
-pkiPath=/root/nebula/host.crt
-pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
-if [ ! -f "$pkiPath" ]; then
-	echo "$pkiKey not found:$pkiPath"
-    exit 1
-fi
-#set pki key
-pkiKey=key
-pkiPath=/root/nebula/host.key
-pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
-if [ ! -f "$pkiPath" ]; then
-	echo "$pkiKey not found:$pkiPath"
-    exit 1
-fi
+pki_setup () {
+	pkiKey=$1
+	pkiPath=$2
+	if [ ! -f "$pkiPath" ] || [ ! -s "$pkiPath" ]; then
+		echo "pki.$pkiKey not found:$pkiPath enter below"
+		while read line
+		do
+		  # break if the line is empty
+		  [ -z "$line" ] && break
+		  echo "$line" >> "$pkiPath"
+		done
+	fi
+	if [ ! -f "$pkiPath" ] || [ ! -s "$pkiPath" ]; then
+		echo "pki.$pkiKey not found:$pkiPath"
+		exit 1
+	fi
+	pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
+}
+pki_setup "ca" "/root/nebula/ca.crt"
+pki_setup "cert" "/root/nebula/host.crt"
+pki_setup "key" "/root/nebula/host.key"
 #listen on all
 value="[::]" yq eval '.listen.host = strenv(value)' --inplace config.yml
 #update mtu
