@@ -1,6 +1,4 @@
 #!/bin/bash
-#curl -s -L https://raw.githubusercontent.com/regbo/lfp-scripts/main/nebula/install.sh | bash
-#curl -s -L https://raw.githubusercontent.com/regbo/lfp-scripts/main/nebula/configure.sh | bash
 set -e
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 mkdir -p /root/nebula
