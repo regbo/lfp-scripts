@@ -1,0 +1,2 @@
+curl -s -L https://raw.githubusercontent.com/regbo/lfp-scripts/main/nebula/install.sh | sudo bash
+curl -s -L https://raw.githubusercontent.com/regbo/lfp-scripts/main/nebula/configure.sh | sudo bash
