@@ -62,10 +62,10 @@ do
 	fi
 	nebula_ip=$nebula_ip public_address=$public_address yq eval '.static_host_map.[strenv(nebula_ip)] += [strenv(public_address)+":4242"]' --inplace config.yml
 done
-echo "is this node a lighthouse?"
-read am_lighthouse
 yq eval 'del(.lighthouse.hosts)' --inplace config.yml
 lighthouse_hosts=$(yq eval '.static_host_map.[] | path | .[-1]' config.yml)
+echo "is this node a lighthouse?"
+read am_lighthouse
 if [[ $(fgrep -ix $am_lighthouse <<< "true") ]]; then
     yq eval '.lighthouse.am_lighthouse = true' --inplace config.yml
 else
@@ -73,7 +73,14 @@ else
 	echo "$lighthouse_hosts" | while read lighthouse_host ; do
 	   lighthouse_host=$lighthouse_host yq eval '.lighthouse.hosts += [strenv(lighthouse_host)]' --inplace config.yml
 	done
+	ufw --force reset
+	ufw allow 22/tcp
+	ufw allow in on nebula1 to any port 2376 proto tcp
+	ufw allow in on nebula1 to any port 7946 proto tcp
+	ufw allow in on nebula1 to any port 7946 proto udp
+	ufw allow in on nebula1 to any port 4789 proto udp
+	ufw allow in on nebula1 to any proto esp
+	ufw --force enable
 fi
-
 #print
 yq e config.yml
