@@ -1,0 +1,79 @@
+#!/bin/bash
+set -e
+[ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
+mkdir -p /root/nebula
+cd /root/nebula
+echo "downloading config"
+curl -s -L https://github.com/slackhq/nebula/raw/master/examples/config.yml --output config.yml
+#set pki ca
+pkiKey=ca
+pkiPath=/root/nebula/ca.crt
+pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
+if [ ! -f "$pkiPath" ]; then
+	echo "$pkiKey not found:$pkiPath"
+    exit 1
+fi
+#set pki cert
+pkiKey=cert
+pkiPath=/root/nebula/host.crt
+pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
+if [ ! -f "$pkiPath" ]; then
+	echo "$pkiKey not found:$pkiPath"
+    exit 1
+fi
+#set pki key
+pkiKey=key
+pkiPath=/root/nebula/host.key
+pkiKey=$pkiKey pkiPath=$pkiPath yq eval '.pki.[strenv(pkiKey)] = strenv(pkiPath)' --inplace config.yml
+if [ ! -f "$pkiPath" ]; then
+	echo "$pkiKey not found:$pkiPath"
+    exit 1
+fi
+#listen on all
+value="[::]" yq eval '.listen.host = strenv(value)' --inplace config.yml
+#update mtu
+yq eval '.tun.mtu = 1500' --inplace config.yml
+#allow inbound any
+yq eval 'del(.firewall.inbound)' --inplace config.yml
+yq eval '.firewall.inbound.[0].port = "any"' --inplace config.yml
+yq eval '.firewall.inbound.[0].proto = "any"' --inplace config.yml
+yq eval '.firewall.inbound.[0].host = "any"' --inplace config.yml
+#remove static_host_map
+yq eval 'del(.static_host_map)' --inplace config.yml
+nebula_ip_added=false
+while true
+do	
+	echo "enter lighthouse nebula ip, or blank to complete"
+	read nebula_ip
+	if [ -z "$nebula_ip" ] && [ $nebula_ip_added != true ]; then
+		echo "Error: at least one lighthouse nebula ip required"
+		exit 1;
+	elif [ -z "$nebula_ip" ]; then
+		break
+	else
+		nebula_ip_added=true
+	fi
+	#read public
+	echo "enter lighthouse public address"
+	read public_address
+	if [ -z "$public_address" ]; then
+		echo "Error: a lighthouse public address is required"
+		exit 1;
+	fi
+	nebula_ip=$nebula_ip public_address=$public_address yq eval '.static_host_map.[strenv(nebula_ip)] += [strenv(public_address)+":4242"]' --inplace config.yml
+done
+echo "is this node a lighthouse?"
+read am_lighthouse
+yq eval 'del(.lighthouse.hosts)' --inplace config.yml
+lighthouse_hosts=$(yq eval '.static_host_map.[] | path | .[-1]' config.yml)
+if [[ $(fgrep -ix $am_lighthouse <<< "true") ]]; then
+    yq eval '.lighthouse.am_lighthouse = true' --inplace config.yml
+else
+	yq eval '.lighthouse.am_lighthouse = false' --inplace config.yml
+	echo "$lighthouse_hosts" | while read lighthouse_host ; do
+	   lighthouse_host=$lighthouse_host yq eval '.lighthouse.hosts += [strenv(lighthouse_host)]' --inplace config.yml
+	done
+fi
+
+#print
+yq e config.yml
