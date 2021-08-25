@@ -1,0 +1,16 @@
+[Unit]
+Description=Nebula overlay networking tool
+
+After=basic.target network.target network-online.target
+Before=sshd.service
+Wants=basic.target network-online.target
+
+[Service]
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStartPre=/bin/sh -c 'until ping -c1 8.8.8.8; do sleep 1; done;'
+ExecStart=/root/nebula/nebula -config /root/nebula/config.yml
+Restart=always
+SyslogIdentifier=nebula
+
+[Install]
+WantedBy=multi-user.target
