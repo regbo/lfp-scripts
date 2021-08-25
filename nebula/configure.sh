@@ -82,5 +82,30 @@ else
 	ufw allow in on nebula1 to any proto esp
 	ufw --force enable
 fi
+serviceFile=/etc/systemd/system/nebula.service
+rm -f $serviceFile
+cat > $serviceFile <<- EOM
+[Unit]
+Description=Nebula overlay networking tool
+
+After=basic.target network.target network-online.target
+Before=sshd.service
+Wants=basic.target network-online.target
+
+[Service]
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStartPre=/bin/sh -c 'until ping -c1 8.8.8.8; do sleep 1; done;'
+ExecStart=/root/nebula/nebula -config /root/nebula/config.yml
+Restart=always
+SyslogIdentifier=nebula
+
+[Install]
+WantedBy=multi-user.target
+EOM
+chmod 664 $serviceFile
+sudo systemctl daemon-reload
+sudo systemctl enable nebula.service
+sudo systemctl start nebula.service
+
 #print
 yq e config.yml
