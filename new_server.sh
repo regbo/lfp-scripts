@@ -27,7 +27,7 @@ APT::Periodic::AutocleanInterval "7";
 APT::Periodic::Unattended-Upgrade "1";
 EOL
 
-/etc/init.d/unattended-upgrades restart
+sudo /etc/init.d/unattended-upgrades restart
 
 
 echo ""
