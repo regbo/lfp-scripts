@@ -20,12 +20,17 @@ sudo sed -i 's|//Unattended-Upgrade::Remove-Unused-Dependencies "false";|Unatten
 sudo sed -i 's|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
 
 # Edit the 10periodic file
-sudo cat >/etc/apt/apt.conf.d/10periodic <<EOL
+TEMP_FILE=$(mktemp)
+
+cat > $TEMP_FILE << EOF
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
 APT::Periodic::AutocleanInterval "7";
 APT::Periodic::Unattended-Upgrade "1";
-EOL
+EOF
+
+sudo sh -c "cat ${TEMP_FILE} > /etc/apt/apt.conf.d/10periodic"
+rm -f $TEMP_FILE
 
 sudo /etc/init.d/unattended-upgrades restart
 
