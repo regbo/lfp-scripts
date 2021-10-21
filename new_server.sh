@@ -60,13 +60,13 @@ sudo sysctl -p /etc/sysctl.conf
 
 echo ""
 echo "Installing docker-ce..."
-# Download Docker
-curl -fsSL get.docker.com -o get-docker.sh
-# Install Docker using the stable channel (instead of the default "edge")
-CHANNEL=stable
-sudo sh get-docker.sh
-# Remove Docker install script
-rm get-docker.sh
+sudo apt-get remove -y docker docker-engine docker.io containerd runc
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install --fix-missing -y docker-ce docker-ce-cli containerd.io
 
 echo "Installing docker-compose..."
 sudo apt-get install docker-compose -y
