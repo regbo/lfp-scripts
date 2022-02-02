@@ -1,6 +1,6 @@
 OUT_FILE=$1
 if [ -z "$OUT_FILE" ]; then
-  OUT_FILE=./environment_variable_file_convert.env
+  OUT_FILE=./env.list
 fi
 echo "" > $OUT_FILE
 env | while IFS= read -r line; do
