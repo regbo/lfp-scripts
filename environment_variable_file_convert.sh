@@ -24,5 +24,6 @@ env | while IFS= read -r line; do
   if [ -z "$valueFile" ]; then
     continue
   fi
-  echo "$nameNoFile=$valueFile" >> $OUT_FILE
+  valueFileEscaped=${1@Q}
+  echo "$nameNoFile=${valueFileEscaped:2:-1}" >> $OUT_FILE
 done
