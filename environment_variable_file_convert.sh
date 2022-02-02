@@ -11,7 +11,7 @@ env | while IFS= read -r line; do
     continue
   fi
   nameNoFile=$(echo ${name%_FILE*})
-  valueNoFile="${!nameNoFile}"
+  valueNoFile=$(sh -c "echo \$${nameNoFile}")
   if [ ! -z "$valueNoFile" ]; then
     continue
   fi
