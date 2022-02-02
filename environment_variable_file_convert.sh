@@ -1,3 +1,8 @@
+OUT_FILE=$1
+if [ -z "$OUT_FILE" ]; then
+  OUT_FILE=./environment_variable_file_convert.env
+fi
+echo "" > $OUT_FILE
 env | while IFS= read -r line; do
   name=${line%%=*}
   if( ! echo "$name" | grep -i "_FILE$" > /dev/null ); then
@@ -19,5 +24,5 @@ env | while IFS= read -r line; do
   if [ -z "$valueFile" ]; then
     continue
   fi
-  export "$nameNoFile"="$valueFile"
+  echo "$nameNoFile=$valueFile" >> $OUT_FILE
 done
