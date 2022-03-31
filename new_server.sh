@@ -21,6 +21,18 @@ sudo sed -i 's|//Unattended-Upgrade::AutoFixInterruptedDpkg "false";|Unattended-
 sudo sed -i 's|//Unattended-Upgrade::Remove-Unused-Dependencies "false";|Unattended-Upgrade::Remove-Unused-Dependencies "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
 sudo sed -i 's|//Unattended-Upgrade::Automatic-Reboot "false";|Unattended-Upgrade::Automatic-Reboot "true";|g' /etc/apt/apt.conf.d/50unattended-upgrades
 
+# prevent kernel updaes (may break swarm)
+BLACKLIST=()
+BLACKLIST+=('"linux-headers*";')
+BLACKLIST+=('"linux-image*";')
+BLACKLIST+=('"linux-generic*";')
+BLACKLIST+=('"linux-modules*";')
+
+for value in "${BLACKLIST[@]}"
+do
+	sed -i '/Unattended-Upgrade::Package-Blacklist/!b;n;c\\n\  '"${value}"''  /etc/apt/apt.conf.d/50unattended-upgrades
+done
+
 # Edit the 10periodic file
 TEMP_FILE=$(mktemp)
 
