@@ -63,11 +63,8 @@ sudo service fail2ban restart
 
 
 echo ""
-echo "Installing tailscale..."
-curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.gpg | sudo apt-key add -
-curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal.list | sudo tee /etc/apt/sources.list.d/tailscale.list
-sudo apt-get update
-sudo apt-get install tailscale
+echo "Installing ZeroTier..."
+curl -s https://install.zerotier.com | sudo bash
 echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
 echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p /etc/sysctl.conf
