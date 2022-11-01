@@ -5,7 +5,7 @@ echo "Starting the new server setup script"
 cd ~
 
 DEBIAN_FRONTEND=noninteractive
-sudo sed -i '/#$nrconf{restart} = '\''i'\'';/c nrconf{restart} = '\''a'\'';' /etc/needrestart/needrestart.conf
+sudo sed -i '/#$nrconf{restart} = '\''i'\'';/c $nrconf{restart} = '\''a'\'';' /etc/needrestart/needrestart.conf
 
 sudo sed -i 's|asi-fs-y.contabo.net|archive.ubuntu.com|g' /etc/apt/sources.list
 
